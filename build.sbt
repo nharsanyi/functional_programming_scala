@@ -1,4 +1,4 @@
-name := "fp_scala"
+name := "functional_programming_scala"
 
 version := "0.1"
 
