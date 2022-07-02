@@ -29,4 +29,14 @@ class StreamTest extends AnyFlatSpec  {
     val stream = streams.Stream.empty[Int]
     assertResult(None)(stream.headOption)
   }
+
+  "exists" should "return true if exists" in {
+    val stream = streams.Stream.apply(1, 3, 7, 8)
+    assertResult(true)(stream.exists(_ % 2 == 0))
+  }
+
+  "exists" should "return false if does not exists" in {
+    val stream = streams.Stream.apply(1, 3, 7, 8)
+    assertResult(false)(stream.exists(_ > 10))
+  }
 }
