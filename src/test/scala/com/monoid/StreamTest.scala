@@ -90,4 +90,24 @@ class StreamTest extends AnyFlatSpec  {
     assertResult(streams.Stream.empty[String])(actual)
     assertResult(Nil)(actual.toList)
   }
+
+  "take" should "return first n element" in {
+    val stream = streams.Stream.apply(2, 3, 5, 1)
+    assertResult(List(2, 3))(stream.take(2).toList)
+  }
+
+  "take" should "return first min(n, s=stream.size) element if n is greater than s" in {
+    val stream = streams.Stream.apply(2, 3, 5, 1)
+    assertResult(List(2, 3, 5, 1))(stream.take(10).toList)
+  }
+
+  "fromWithUnfold" should "generate infinite stream starting from n" in {
+    val stream = streams.Stream.fromWithUnfold(10)
+    assertResult(List(10, 11, 12, 13, 14, 15))(stream.take(6).toList)
+  }
+
+  "fromWithUnfold" should "generate infinite stream starting from negative n" in {
+    val stream = streams.Stream.fromWithUnfold(-10)
+    assertResult(List(-10, -9, -8, -7, -6, -5))(stream.take(6).toList)
+  }
 }

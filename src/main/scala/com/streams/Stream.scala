@@ -27,6 +27,11 @@ sealed trait Stream[+A] {
 
   def map[B](f: A => B): Stream[B] = foldRight[Stream[B]](Empty)((curr, s) => Stream.cons(f(curr), s))
 
+  def take(n: Int): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, t) => if (n == 0) Empty else Stream.cons(h(), t().take(n - 1))
+  }
+
   def takeWhile(p: A => Boolean): Stream[A] = this match {
     case Empty => Empty
     case Cons(h, t) => if (p(h())) Stream.cons(h(), t().takeWhile(p)) else Empty
@@ -39,6 +44,7 @@ sealed trait Stream[+A] {
     case Empty => false
     case s => s.foldRight(false)((head, res) => p(head) || res)
   }
+
 }
 
 case object Empty extends Stream[Nothing]
@@ -61,4 +67,15 @@ object Stream {
   def from(n: Int): Stream[Int] = {
      cons(n, from(n + 1))
   }
+
+  def fromWithUnfold(n: Int): Stream[Int] = {
+    val f: Int => Option[(Int, Int)] = a => Some(a, a + 1)
+    unfold(n)(f)
+  }
+
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]):Stream[A] =
+    f(z) match {
+      case Some((a, s)) => Stream.cons(a, unfold(s)(f))
+      case _ => Empty
+    }
 }
