@@ -7,6 +7,9 @@ sealed trait Stream[+A] {
     case Cons(h, _) => Some(h())
   }
 
+  def headOptionWithFold(): Option[A] =
+    foldRight[Option[A]](None)((curr, _) => Some(curr))
+
   def toList: List[A] = this match {
     case Empty => Nil
     case Cons(h, t) => h() :: t().toList
@@ -21,6 +24,16 @@ sealed trait Stream[+A] {
     case Empty => z
     case Cons(h, t) => f(h(), t().foldRight(z)(f))
   }
+
+  def map[B](f: A => B): Stream[B] = foldRight[Stream[B]](Empty)((curr, s) => Stream.cons(f(curr), s))
+
+  def takeWhile(p: A => Boolean): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, t) => if (p(h())) Stream.cons(h(), t().takeWhile(p)) else Empty
+  }
+
+  def takeWhileWithFold(p: A => Boolean): Stream[A] =
+    foldRight[Stream[A]](Empty)((curr, s) => if (p(curr)) Stream.cons(curr, s) else Empty)
 
   def exists(p: A => Boolean): Boolean = this match {
     case Empty => false
